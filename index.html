@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>富村镇新坪小学智能课程表</title>
+    <!-- html2canvas 用于课表转图片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #05445E 0%, #1e7fb0 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 1600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 60px;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.5);
+            padding: 40px 40px;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #05445E;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        h1 small {
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #1e7fb0, #05445E);
+            color: white;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            display: inline-block;
+            margin-left: 15px;
+            white-space: nowrap;
+        }
+
+        .subtitle {
+            color: #2c5a7a;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            background: rgba(30, 127, 176, 0.05);
+            padding: 15px;
+            border-radius: 40px;
+        }
+
+        /* 查询区域 */
+        .search-panel {
+            background: white;
+            border-radius: 100px;
+            padding: 8px 8px 8px 40px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 20px 40px -15px #05445E99;
+            margin-bottom: 40px;
+            border: 2px solid rgba(30, 127, 176, 0.2);
+            transition: all 0.3s;
+        }
+
+        .search-panel:focus-within {
+            border-color: #1e7fb0;
+            box-shadow: 0 25px 45px -15px #05445E;
+        }
+
+        .search-panel label {
+            color: #05445E;
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #teacherNameInput {
+            flex: 1 1 350px;
+            border: none;
+            padding: 18px 28px;
+            font-size: 1.2rem;
+            background: #f0f8ff;
+            border-radius: 60px;
+            outline: none;
+            transition: 0.3s;
+            color: #01273b;
+            font-weight: 500;
+            border: 2px solid transparent;
+        }
+
+        #teacherNameInput:focus {
+            background: #ffffff;
+            border-color: #1e7fb0;
+            box-shadow: 0 0 0 5px rgba(30, 127, 176, 0.2);
+        }
+
+        .search-panel button {
+            background: linear-gradient(135deg, #05445E, #1e7fb0);
+            border: none;
+            color: white;
+            padding: 18px 48px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px #05445E;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .search-panel button:hover {
+            background: linear-gradient(135deg, #1e7fb0, #05445E);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 35px #05445E;
+        }
+
+        /* 教师信息栏 */
+        .teacher-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0 30px 0;
+            background: linear-gradient(135deg, #e3f0fa, #d4e9f7);
+            border-radius: 80px;
+            padding: 20px 40px;
+            border: 2px solid white;
+            box-shadow: 0 15px 25px -10px #05445E66;
+        }
+
+        .teacher-name {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #05445E;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .teacher-name::before {
+            content: "👩‍🏫";
+            font-size: 2.5rem;
+        }
+
+        .teacher-stats {
+            margin-left: 30px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e7fb0;
+        }
+
+        .class-count {
+            color: #05445E;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 5px;
+        }
+
+        .btn-group {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 3px solid #1e7fb0;
+            color: #05445E;
+            padding: 14px 35px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-outline:hover {
+            background: #1e7fb0;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px #1e7fb0;
+            border-color: white;
+        }
+
+        /* 课表层 */
+        .timetable-wrap {
+            background: white;
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: 0 30px 50px -20px #05445E;
+            border: 2px solid rgba(255,255,255,0.9);
+            overflow-x: auto;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.2rem;
+            min-width: 1000px;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        /* 列头样式 - 更醒目的颜色和字体 */
+        th {
+            background: linear-gradient(135deg, #0A2F44, #1B4F6E);
+            color: #FFE484;  /* 亮黄色文字 */
+            font-weight: 800;
+            font-size: 1.4rem;
+            padding: 20px 12px;
+            text-align: center;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+        }
+
+        td {
+            background: white;
+            padding: 15px 10px;
+            text-align: center;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+            color: #02314a;
+            vertical-align: middle;
+            font-weight: 500;
+        }
+
+        /* 行头（时间列）样式 */
+        .time-column {
+            background: linear-gradient(135deg, #f0f9ff, #e1f0fd);
+            font-weight: 700;
+            color: #05445E;
+            text-align: center !important;
+            padding: 15px 10px !important;
+            font-size: 1.2rem;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            width: 120px;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+        }
+        
+        .time-range {
+            font-size: 1rem;
+            color: #1e7fb0;
+            font-weight: 500;
+            display: block;
+            margin-top: 5px;
+            font-family: monospace;
+            background: rgba(30, 127, 176, 0.1);
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        /* 公共时段合并单元格样式 */
+        .public-time-merged {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 25px 10px !important;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #05445E;
+            background: white !important;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+        }
+        
+        .public-time-name-large {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #05445E;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .public-time-desc {
+            font-size: 1.2rem;
+            color: #1e7fb0;
+            display: block;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* 课程单元格样式 */
+        .course-cell {
+            background-color: white;
+            padding: 12px 8px;
+            line-height: 1.5;
+            transition: all 0.2s;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+        }
+        
+        .course-cell:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.01);
+        }
+        
+        .course-name {
+            font-weight: 700;
+            color: #05445E;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .course-grade {
+            font-size: 1rem;
+            color: #1e7fb0;
+            background: rgba(30, 127, 176, 0.1);
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 30px;
+        }
+        
+        /* 合并单元格样式 */
+        .merged-cell {
+            background: white;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+        }
+        
+        .merged-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .merged-badge {
+            background: #1e7fb0;
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 30px;
+        }
+
+        .empty-cell {
+            color: #b0c9dd;
+            font-style: italic;
+            background: white;
+            font-size: 1.2rem;
+            border: 2px solid #000000;  /* 黑色加粗边框 */
+        }
+
+        .footer-note {
+            text-align: right;
+            color: #4a6f88;
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+
+        .toast {
+            background: linear-gradient(135deg, #05445E, #1e7fb0);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 80px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 25px 45px #022b40;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            border: 3px solid white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 30px;
+            background: linear-gradient(135deg, #f8fcff, #ecf5fc);
+            border-radius: 40px;
+            color: #1e7fb0;
+            font-size: 1.6rem;
+            border: 3px dashed #1e7fb0;
+        }
+
+        #save-container {
+            background: white;
+            border-radius: 40px;
+            padding: 40px;
+            display: inline-block;
+            width: auto;
+            min-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>
+        富村镇新坪小学智能课程表
+        <small>教师查询系统</small>
+    </h1>
+    <div class="subtitle">👇 输入教师姓名，查看完整作息安排</div>
+
+    <div class="search-panel">
+        <label for="teacherNameInput">🔍 教师姓名</label>
+        <input type="text" id="teacherNameInput" placeholder="例如：丁素花, 张灏馨, 田永帅..." value="丁素花">
+        <button id="searchBtn">📋 查询课表</button>
+    </div>
+
+    <!-- 教师信息栏 -->
+    <div id="teacherBar" class="teacher-bar" style="display: none;">
+        <div id="currentTeacherDisplay" class="teacher-name"></div>
+        <div class="teacher-stats" id="teacherStats">
+            <span class="class-count" id="totalClassesDisplay">0</span>节
+        </div>
+        <div class="btn-group">
+            <button class="btn-outline" id="saveAsImageBtn">📸 保存课表</button>
+        </div>
+    </div>
+
+    <div id="timetableContainer" class="timetable-wrap">
+        <!-- 动态渲染 -->
+    </div>
+
+    <div class="footer-note">
+        ⏰ 点击保存课表可生成高清图片
+    </div>
+</div>
+
+<div id="liveToast" class="toast">
+    <span>✅</span> <span id="toastText">操作成功</span>
+</div>
+
+<script>
+(function() {
+    // ---------- 完整作息时间定义 ----------
+    const dailySchedule = [
+        // 早晨时段
+        { 
+            period: 'morning_routine', 
+            name: '早晨准备', 
+            start: '6:50', 
+            end: '8:20', 
+            desc: '起床·早操·早餐',
+            type: 'morning',
+            isPublic: true
+        },
+        
+        // 第1节
+        { period: 1, name: '第1节', start: '8:20', end: '9:00', type: 'class' },
+        
+        // 眼保健操
+        { 
+            period: 'eye_exercise', 
+            name: '眼保健操', 
+            start: '9:00', 
+            end: '9:15', 
+            desc: '眼保健操',
+            type: 'break',
+            isPublic: true
+        },
+        
+        // 第2节
+        { period: 2, name: '第2节', start: '9:15', end: '9:55', type: 'class' },
+        
+        // 大课间
+        { 
+            period: 'big_break', 
+            name: '大课间', 
+            start: '9:55', 
+            end: '10:25', 
+            desc: '课间操·自由活动',
+            type: 'break',
+            isPublic: true
+        },
+        
+        // 第3节
+        { period: 3, name: '第3节', start: '10:25', end: '11:05', type: 'class' },
+        
+        // 第4节
+        { period: 4, name: '第4节', start: '11:20', end: '12:00', type: 'class' },
+        
+        // 午休时段
+        { 
+            period: 'lunch_break', 
+            name: '午餐午休', 
+            start: '12:00', 
+            end: '14:00', 
+            desc: '午餐·午休',
+            type: 'lunch',
+            isPublic: true
+        },
+        
+        // 第5节
+        { period: 5, name: '第5节', start: '14:00', end: '14:40', type: 'class' },
+        
+        // 眼保健操
+        { 
+            period: 'eye_exercise_2', 
+            name: '眼保健操', 
+            start: '14:40', 
+            end: '14:55', 
+            desc: '眼保健操',
+            type: 'break',
+            isPublic: true
+        },
+        
+        // 第6节
+        { period: 6, name: '第6节', start: '14:55', end: '15:35', type: 'class' },
+        
+        // 课后服务
+        { 
+            period: 'after_school', 
+            name: '课后服务', 
+            start: '15:50', 
+            end: '17:25', 
+            desc: '课后服务·作业辅导',
+            type: 'evening',
+            isPublic: true
+        },
+        
+        // 自由活动
+        { 
+            period: 'free_time', 
+            name: '自由活动', 
+            start: '17:25', 
+            end: '19:00', 
+            desc: '自由活动时间',
+            type: 'evening',
+            isPublic: true
+        },
+        
+        // 晚自习
+        { 
+            period: 'evening_study', 
+            name: '晚自习', 
+            start: '19:00', 
+            end: '20:35', 
+            desc: '晚自习',
+            type: 'evening',
+            isPublic: true
+        }
+    ];
+
+    // 解析课程字符串
+    function parseCourse(courseStr) {
+        if (!courseStr || courseStr === '') return null;
+        
+        const match = courseStr.match(/^(.+?)\((.+?)\)$/);
+        if (match) {
+            return {
+                name: match[1].trim(),
+                grade: match[2].trim()
+            };
+        }
+        return {
+            name: courseStr,
+            grade: ''
+        };
+    }
+
+    // 检测是否为合并单元格
+    function isMergedCourse(courseStr) {
+        if (!courseStr) return false;
+        return courseStr.includes('/') || courseStr.includes('、') || courseStr.includes('，');
+    }
+
+    // 处理合并单元格
+    function parseMergedCourse(courseStr) {
+        if (!courseStr) return [];
+        
+        const separators = ['/', '、', '，', ','];
+        let courses = [courseStr];
+        
+        for (let sep of separators) {
+            if (courseStr.includes(sep)) {
+                courses = courseStr.split(sep).map(c => c.trim()).filter(c => c);
+                break;
+            }
+        }
+        
+        return courses.map(c => parseCourse(c)).filter(c => c !== null);
+    }
+
+    // ---------- 教师课表数据 ----------
+    const scheduleMap = new Map();
+
+    // 1. 丁素花
+    scheduleMap.set('丁素花', {
+        Monday: ['', '语文(一年级)', '语文(一年级)', '道德与法治(一年级)', '体育与健康(一年级)', '科学(一年级)', ''],
+        Tuesday: ['', '', '', '语文(一年级)', '', '道德与法治(一年级)', ''],
+        Wednesday: ['', '', '语文(一年级)', '语文(一年级)', '语文(一年级)', '体育与健康(一年级)', ''],
+        Thursday: ['', '语文(一年级)', '科学(一年级)', '', '体育与健康(一年级)', '', ''],
+        Friday: ['', '语文(一年级)', '语文(一年级)', '', '体育与健康(一年级)', '', '']
+    });
+
+    // 2. 张灏馨
+    scheduleMap.set('张灏馨', {
+        Monday: ['', '数学(一年级)', '艺术(一年级)', '语文/数学(一年级)', '', '艺术(二年级)', '艺术(一年级)'],
+        Tuesday: ['', '数学(二年级)', '数学(二年级)', '艺术(二年级)', '', '英语(四年级)', '数学(一年级)'],
+        Wednesday: ['', '数学(一年级)', '数学(一年级)', '数学(二年级)', '艺术(二年级)', '', ''],
+        Thursday: ['', '', '英语(四年级)', '校本教研(四年级)', '数学(二年级)', '艺术(一年级)', ''],
+        Friday: ['', '数学(二年级)', '', '数学(一年级)', '校本教研(四年级)', '艺术(二年级)', '艺术(一年级)']
+    });
+
+    // 3. 田永帅
+    scheduleMap.set('田永帅', {
+        Monday: ['', '语文(二年级)', '语文(二年级)', '语文(二年级)', '', '', '体育与健康(二年级)'],
+        Tuesday: ['', '', '', '', '', '体育与健康(二年级)', '语文(二年级)'],
+        Wednesday: ['', '语文(二年级)', '语文(二年级)', '', '体育与健康/道德与法治(二年级)', '道德与法治(二年级)', ''],
+        Thursday: ['', '语文(二年级)', '语文(二年级)', '科学(二年级)', '体育与健康(二年级)', '体育与健康(二年级)', ''],
+        Friday: ['', '', '语文(二年级)', '道德与法治(二年级)', '体育与健康(二年级)', '', '科学(二年级)']
+    });
+
+    // 4. 杨朝云
+    scheduleMap.set('杨朝云', {
+        Monday: ['', '', '', '数学(三年级)', '信息技术(三年级)', '', ''],
+        Tuesday: ['', '数学(三年级)', '数学(三年级)', '', '综合实践(二年级)', '体育与健康(三年级)', ''],
+        Wednesday: ['', '', '', '', '体育与健康(三年级)', '综合实践(三年级)', '劳动(三年级)'],
+        Thursday: ['', '数学(三年级)', '科学(三年级)', '', '', '', '劳动(二年级)'],
+        Friday: ['', '', '', '数学(三年级)', '体育与健康(三年级)', '校本教研(三年级)', '科学(三年级)']
+    });
+
+    // 5. 温月利
+    scheduleMap.set('温月利', {
+        Monday: ['', '英语(三年级)', '艺术(三年级)', '', '校本教研(二年级)', '', ''],
+        Tuesday: ['', '', '', '语文(三年级)', '语文(三年级)', '艺术(三年级)', ''],
+        Wednesday: ['', '语文(三年级)', '语文(三年级)', '语文(三年级)', '', '', '地方课程(二年级)'],
+        Thursday: ['', '', '', '艺术(三年级)', '艺术(三年级)', '地方课程(三年级)', '英语(三年级)'],
+        Friday: ['', '语文(三年级)', '语文(三年级)', '', '', '', '']
+    });
+
+    // 6. 刘仕平
+    scheduleMap.set('刘仕平', {
+        Monday: ['', '', '', '', '道德与法治(三年级)', '道德与法治(三年级)', ''],
+        Tuesday: ['', '', '', '', '地方课程(一年级)', '体育与健康(五年级)', '道德与法治(五年级)'],
+        Wednesday: ['', '', '', '', '道德与法治(五年级)', '科学(五年级)', ''],
+        Thursday: ['', '', '', '校本教研(一年级)', '体育与健康(五年级)', '综合实践(一年级)', ''],
+        Friday: ['', '', '', '', '科学(五年级)', '道德与法治(五年级)', '']
+    });
+
+    // 7. 陈柯言
+    scheduleMap.set('陈柯言', {
+        Monday: ['', '语文(四年级)', '语文(四年级)', '科学(四年级)', '', '', '艺术(四年级)'],
+        Tuesday: ['', '语文(四年级)', '道德与法治(四年级)', '', '', '', '艺术(四年级)'],
+        Wednesday: ['', '', '', '地方课程(四年级)', '艺术(四年级)', '语文(四年级)', '道德与法治(四年级)'],
+        Thursday: ['', '艺术(四年级)', '', '', '语文(四年级)', '劳动(四年级)', ''],
+        Friday: ['', '语文(四年级)', '语文(四年级)', '科学(四年级)', '', '', '']
+    });
+
+    // 8. 张梅芳
+    scheduleMap.set('张梅芳', {
+        Monday: ['', '数学(五年级)', '数学(五年级)', '', '综合实践(四年级)', '体育与健康(四年级)', ''],
+        Tuesday: ['', '', '', '数学(四年级)', '数学(四年级)', '', ''],
+        Wednesday: ['', '数学(四年级)', '数学(四年级)', '', '综合实践(五年级)', '', ''],
+        Thursday: ['', '', '', '地方课程(五年级)', '校本教研(五年级)', '体育与健康(四年级)', ''],
+        Friday: ['', '数学(五年级)', '数学(五年级)', '信息技术(五年级)', '', '体育与健康(四年级)', '信息技术(四年级)']
+    });
+
+    // 9. 何柳
+    scheduleMap.set('何柳', {
+        Monday: ['', '', '', '语文(五年级)', '英语(五年级)', '艺术(五年级)', '语文(五年级)'],
+        Tuesday: ['', '语文(五年级)', '语文(五年级)', '语文(五年级)', '', '', ''],
+        Wednesday: ['', '语文(五年级)', '语文(五年级)', '艺术(五年级)', '', '', '劳动(六年级)'],
+        Thursday: ['', '英语(五年级)', '艺术(五年级)', '', '', '', '艺术(五年级)'],
+        Friday: ['', '', '', '英语(六年级)', '英语(六年级)', '', '']
+    });
+
+    // 10. 罗超
+    scheduleMap.set('罗超', {
+        Monday: ['', '语文(六年级)', '道德与法治(六年级)', '', '', '艺术(六年级)', ''],
+        Tuesday: ['', '', '', '语文(六年级)', '信息技术(六年级)', '', '艺术(六年级)'],
+        Wednesday: ['', '语文(六年级)', '语文(六年级)', '', '', '语文(六年级)', ''],
+        Thursday: ['', '', '', '语文(六年级)', '艺术(六年级)', '', '道德与法治(六年级)'],
+        Friday: ['', '语文(六年级)', '综合实践(六年级)', '', '', '劳动(一年级)', '']
+    });
+
+    // 11. 刘发国
+    scheduleMap.set('刘发国', {
+        Monday: ['', '', '', '科学(六年级)', '体育与健康(六年级)', '', '科学(六年级)'],
+        Tuesday: ['', '数学(六年级)', '数学(六年级)', '', '劳动(五年级)', '体育与健康(六年级)', ''],
+        Wednesday: ['', '', '', '数学(六年级)', '体育与健康(六年级)', '', ''],
+        Thursday: ['', '数学(六年级)', '数学(六年级)', '', '', '', ''],
+        Friday: ['', '', '', '', '', '校本教研(六年级)', '地方课程(六年级)']
+    });
+
+    // ---------- DOM 元素 ----------
+    const searchBtn = document.getElementById('searchBtn');
+    const teacherInput = document.getElementById('teacherNameInput');
+    const teacherBar = document.getElementById('teacherBar');
+    const currentDisplay = document.getElementById('currentTeacherDisplay');
+    const totalClassesDisplay = document.getElementById('totalClassesDisplay');
+    const timetableDiv = document.getElementById('timetableContainer');
+    const saveBtn = document.getElementById('saveAsImageBtn');
+    const toast = document.getElementById('liveToast');
+    const toastText = document.getElementById('toastText');
+
+    function showMessage(msg, duration = 2000) {
+        toastText.innerText = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => { toast.style.display = 'none'; }, duration);
+    }
+
+    // 计算教师总课时
+    function calculateTotalClasses(data) {
+        let total = 0;
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        for (let day of days) {
+            const dayCourses = data[day] || [];
+            for (let period = 1; period <= 6; period++) {
+                if (dayCourses[period] && dayCourses[period].trim() !== '') {
+                    total++;
+                }
+            }
+        }
+        return total;
+    }
+
+    // 生成课程单元格
+    function generateCourseCell(courseStr) {
+        if (!courseStr || courseStr.trim() === '') {
+            return `<td class="empty-cell">—</td>`;
+        }
+        
+        const trimmed = courseStr.trim();
+        
+        if (isMergedCourse(trimmed)) {
+            const courses = parseMergedCourse(trimmed);
+            let html = `<td class="course-cell merged-cell"><div class="merged-content">`;
+            
+            courses.forEach((course, index) => {
+                if (course) {
+                    html += `<div style="margin-bottom: ${index < courses.length-1 ? '6px' : '0'};">`;
+                    html += `<span class="course-name">${course.name}</span>`;
+                    if (course.grade) {
+                        html += `<span class="course-grade">${course.grade}</span>`;
+                    }
+                    if (courses.length > 1) {
+                        html += `<span class="merged-badge" style="margin-left: 4px;">合</span>`;
+                    }
+                    html += `</div>`;
+                }
+            });
+            
+            html += `</div></td>`;
+            return html;
+        }
+        
+        const course = parseCourse(trimmed);
+        if (course) {
+            return `<td class="course-cell">
+                <span class="course-name">${course.name}</span>
+                ${course.grade ? `<span class="course-grade">${course.grade}</span>` : ''}
+            </td>`;
+        }
+        
+        return `<td class="empty-cell">${trimmed}</td>`;
+    }
+
+    // 生成公共时段行
+    function generatePublicTimeRow(period) {
+        // 第一列：时间
+        let timeColumn = `<td class="time-column">
+            <span class="time-range">${period.start}-${period.end}</span>
+        </td>`;
+        
+        // 第二列到第六列：合并5列，居中显示时段名称
+        let mergedColumn = `<td class="public-time-merged" colspan="5">
+            <span class="public-time-name-large">${period.name}</span>
+            ${period.desc ? `<span class="public-time-desc">${period.desc}</span>` : ''}
+        </td>`;
+        
+        return `<tr>${timeColumn}${mergedColumn}</tr>`;
+    }
+
+    // 渲染课表
+    function renderTimetable(teacherName) {
+        if (!teacherName) return false;
+        const trimmed = teacherName.trim();
+        const data = scheduleMap.get(trimmed);
+        if (!data) {
+            teacherBar.style.display = 'none';
+            timetableDiv.innerHTML = `<div class="empty-state">😕 没有找到 “${trimmed}” 的课表。<br>可查询：丁素花, 张灏馨, 田永帅, 杨朝云, 温月利, 刘仕平, 陈柯言, 张梅芳, 何柳, 罗超, 刘发国</div>`;
+            return false;
+        }
+
+        const totalClasses = calculateTotalClasses(data);
+        
+        teacherBar.style.display = 'flex';
+        currentDisplay.innerText = trimmed;
+        totalClassesDisplay.innerText = totalClasses;
+
+        let html = `<div class="table-container"><table id="teacherScheduleTable">`;
+        
+        // 表头
+        html += `<thead><tr>`;
+        html += `<th>时间</th>`;
+        html += `<th>星期一</th><th>星期二</th><th>星期三</th><th>星期四</th><th>星期五</th>`;
+        html += `</tr></thead><tbody>`;
+
+        // 按作息时间表循环
+        for (let period of dailySchedule) {
+            if (period.type === 'class') {
+                const periodNum = period.period;
+                html += `<tr class="class-period-row">`;
+                html += `<td class="time-column">${period.name}<span class="time-range">${period.start}-${period.end}</span></td>`;
+                
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                for (let day of days) {
+                    const dayCourses = data[day] || Array(7).fill('');
+                    let course = dayCourses[periodNum] || '';
+                    html += generateCourseCell(course);
+                }
+                html += `</tr>`;
+            } else if (period.isPublic) {
+                html += generatePublicTimeRow(period);
+            }
+        }
+        
+        html += `</tbody></table></div>`;
+        
+        timetableDiv.innerHTML = html;
+        return true;
+    }
+
+    // 初始显示
+    renderTimetable('丁素花');
+    teacherInput.value = '丁素花';
+
+    searchBtn.addEventListener('click', () => {
+        const name = teacherInput.value.trim();
+        if (name === '') {
+            showMessage('请输入教师姓名', 1500);
+            return;
+        }
+        const success = renderTimetable(name);
+        if (success) showMessage(`已加载 ${name} 的课表`);
+        else showMessage(`未找到教师 “${name}”`, 1600);
+    });
+
+    teacherInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchBtn.click();
+    });
+
+    // 保存图片
+    saveBtn.addEventListener('click', async function() {
+        const teacherName = currentDisplay.innerText;
+        if (!teacherName || !scheduleMap.has(teacherName)) {
+            showMessage('无课表可保存', 1500);
+            return;
+        }
+
+        showMessage('正在生成图片...', 2000);
+        
+        const saveContainer = document.createElement('div');
+        saveContainer.id = 'save-container';
+        saveContainer.style.background = 'white';
+        saveContainer.style.padding = '40px';
+        saveContainer.style.borderRadius = '40px';
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.style.marginBottom = '30px';
+        titleDiv.style.padding = '20px 30px';
+        titleDiv.style.background = 'linear-gradient(135deg, #0A2F44, #1B4F6E)';
+        titleDiv.style.borderRadius = '30px';
+        titleDiv.style.color = '#FFE484';
+        titleDiv.style.fontWeight = 'bold';
+        titleDiv.style.fontSize = '2.2rem';
+        titleDiv.style.display = 'flex';
+        titleDiv.style.alignItems = 'center';
+        titleDiv.style.justifyContent = 'space-between';
+        titleDiv.style.border = '2px solid #000000';
+        
+        const data = scheduleMap.get(teacherName);
+        const totalClasses = calculateTotalClasses(data);
+        
+        titleDiv.innerHTML = `
+            <span>📚 ${teacherName} 课程表 (${totalClasses}节)</span>
+            <span style="font-size:1.2rem; background: rgba(255,255,255,0.2); padding: 8px 25px; border-radius: 40px; border: 2px solid #000000;">${new Date().toLocaleDateString()}</span>
+        `;
+        saveContainer.appendChild(titleDiv);
+        
+        const tableClone = document.getElementById('teacherScheduleTable').cloneNode(true);
+        tableClone.style.width = '100%';
+        tableClone.style.minWidth = '1000px';
+        saveContainer.appendChild(tableClone);
+        
+        saveContainer.style.position = 'absolute';
+        saveContainer.style.left = '-9999px';
+        saveContainer.style.top = '0';
+        document.body.appendChild(saveContainer);
+        
+        try {
+            const canvas = await html2canvas(saveContainer, {
+                scale: 2.5,
+                backgroundColor: '#ffffff',
+                logging: false,
+                allowTaint: true,
+                useCORS: true,
+                windowWidth: saveContainer.scrollWidth,
+                windowHeight: saveContainer.scrollHeight
+            });
+            
+            const link = document.createElement('a');
+            link.download = `${teacherName}_课程表.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            document.body.removeChild(saveContainer);
+            showMessage('✅ 课程表已保存', 2500);
+            
+        } catch (error) {
+            console.error('截图失败:', error);
+            document.body.removeChild(saveContainer);
+            showMessage('❌ 图片生成失败，请重试', 2000);
+        }
+    });
+})();
+</script>
+</body>
+</html>
